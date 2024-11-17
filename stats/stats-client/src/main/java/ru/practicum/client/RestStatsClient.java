@@ -22,7 +22,7 @@ import java.util.Map;
 @Service
 public class RestStatsClient extends BaseClient implements StatsClient {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public RestStatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
@@ -46,8 +46,8 @@ public class RestStatsClient extends BaseClient implements StatsClient {
 
     public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
-                "start", start.format(formatter),
-                "end", end.format(formatter),
+                "start", start.format(DEFAULT_DATE_FORMATTER),
+                "end", end.format(DEFAULT_DATE_FORMATTER),
                 "uris", String.join(",", uris),
                 "unique", unique
         );
@@ -55,9 +55,7 @@ public class RestStatsClient extends BaseClient implements StatsClient {
         try {
             return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
         } catch (Exception e) {
-            System.err.println("Error executing getStats: " + e.getMessage());
-            e.printStackTrace();
-
+            log.error("Error executing getStats: {}", e.getMessage(), e);
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
