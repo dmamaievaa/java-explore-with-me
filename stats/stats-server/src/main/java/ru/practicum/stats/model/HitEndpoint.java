@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "stats")
 @Builder
 @Getter
 @Setter
@@ -32,5 +35,6 @@ public class HitEndpoint {
 
     String ip;
 
+    @Column(name = "created_at", nullable = false)
     LocalDateTime timestamp;
 }
