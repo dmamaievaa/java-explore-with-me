@@ -182,7 +182,7 @@ public class EventServiceImpl implements EventService {
         }
 
         Category category = categoryRepository.findById(newEventDto.getCategory())
-                .orElseThrow(() -> new NotFoundException(String.format(CAT_NOT_FOUND_MESSAGE, newEventDto.getCategory() )));
+                .orElseThrow(() -> new NotFoundException(String.format(CAT_NOT_FOUND_MESSAGE, newEventDto.getCategory())));
 
         Location location = newEventDto.getLocation();
         if (location != null && location.getId() == null) {
