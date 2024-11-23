@@ -10,5 +10,7 @@ public interface StatsClient {
 
     void postStats(HitDto endpointHitDto);
 
+    <T> ResponseEntity create(T body);
+
     ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique);
 }
