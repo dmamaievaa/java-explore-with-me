@@ -15,7 +15,6 @@ public class CompilationDto {
 
     Integer id;
 
-    //boolean pinned = false;
     boolean pinned;
 
     String title;

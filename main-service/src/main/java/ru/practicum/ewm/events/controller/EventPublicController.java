@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/events")
 @RequiredArgsConstructor
 public class EventPublicController {
-    //информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики!
 
     private final EventService eventService;
 
