@@ -28,12 +28,15 @@ public class StatsServiceImpl implements StatsService {
         statsRepository.save(endpointHit);
     }
 
-    @Override
-    public List<GetStatsResponseDto> getStatsViewList(GetStatsRequestDto statsRequestDto) {
-        List<String> uris = statsRequestDto.getUris().isEmpty() ? null : statsRequestDto.getUris();
+   @Override
+   public List<GetStatsResponseDto> getStatsViewList(GetStatsRequestDto statsRequestDto) {
+       List<String> uris = (statsRequestDto.getUris() == null || statsRequestDto.getUris().isEmpty()) ? null : statsRequestDto.getUris();
 
-        return statsRequestDto.isUnique() ?
-                statsRepository.getUniqueStats(statsRequestDto.getStart(), statsRequestDto.getEnd(), uris) :
-                statsRepository.getStats(statsRequestDto.getStart(), statsRequestDto.getEnd(), uris);
-    }
+       boolean isUnique = Boolean.TRUE.equals(statsRequestDto.getUnique());
+
+       return isUnique ?
+               statsRepository.getUniqueStats(statsRequestDto.getStart(), statsRequestDto.getEnd(), uris) :
+               statsRepository.getStats(statsRequestDto.getStart(), statsRequestDto.getEnd(), uris);
+   }
+
 }

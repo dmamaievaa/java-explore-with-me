@@ -1,24 +1,34 @@
 package ru.practicum.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @ToString
-@Builder(toBuilder = true)
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetStatsRequestDto {
 
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime start;
+
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime end;
+
+    List<String> uris;
+
+    @JsonProperty(defaultValue = "false")
     @Builder.Default
-    private LocalDateTime start = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
-
-    @Builder.Default
-    private LocalDateTime end = LocalDateTime.now();
-
-    private List<String> uris;
-
-    private boolean unique;
+    Boolean unique = false;
 }
