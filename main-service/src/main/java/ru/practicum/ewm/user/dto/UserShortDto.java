@@ -13,6 +13,4 @@ public class UserShortDto {
     Integer id;
 
     String name;
-
-    String description;
 }
