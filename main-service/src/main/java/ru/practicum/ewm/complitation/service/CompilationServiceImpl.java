@@ -1,7 +1,6 @@
 package ru.practicum.ewm.complitation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,18 +32,18 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationMapper compilationMapper;
     private final EventMapper eventMapper;
 
- @Override
- public List<CompilationDto> getAll(Boolean pinned, int from, int size) {
-     Pageable pageable = PageRequest.of(from / size, size);
+    @Override
+    public List<CompilationDto> getAll(Boolean pinned, int from, int size) {
+        Pageable pageable = PageRequest.of(from / size, size);
 
-     Page<Compilation> compilationsPage = (pinned != null)
-             ? compilationRepository.findAllByPinned(pinned, pageable)
-             : compilationRepository.findAll(pageable);
+        List<Compilation> compilations = (pinned != null)
+                ? compilationRepository.findAllByPinned(pinned, pageable)
+                : compilationRepository.findAll(pageable).toList();
 
-     return compilationsPage.stream()
-             .map(compilation -> compilationMapper.toCompilationDto(compilation, mapEventsToShortDtos(compilation.getEvents())))
-             .toList();
- }
+        return compilations.stream()
+                .map(compilation -> compilationMapper.toCompilationDto(compilation, mapEventsToShortDtos(compilation.getEvents())))
+                .toList();
+    }
 
     @Override
     public CompilationDto getById(Integer compId) {
@@ -84,24 +83,18 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto update(Integer compId, UpdateCompilationRequest updateCompilationRequest) {
-
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException(String.format(COMPILATION_NOT_FOUND_MESSAGE, compId)));
 
-        StringBuilder updatedFieldsLog = new StringBuilder();
-
         if (updateCompilationRequest.getTitle() != null) {
             compilation.setTitle(updateCompilationRequest.getTitle());
-            updatedFieldsLog.append("Title|");
         }
         if (updateCompilationRequest.getEvents() != null) {
             Set<Event> events = new HashSet<>(eventRepository.findAllById(updateCompilationRequest.getEvents()));
             compilation.setEvents(events);
-            updatedFieldsLog.append("Events|");
         }
         if (updateCompilationRequest.getPinned() != null) {
             compilation.setPinned(updateCompilationRequest.getPinned());
-            updatedFieldsLog.append("Pinned|");
         }
 
         compilation = compilationRepository.save(compilation);
@@ -112,7 +105,6 @@ public class CompilationServiceImpl implements CompilationService {
 
         return compilationMapper.toCompilationDto(compilation, eventShortDtos);
     }
-
 
     private List<EventShortDto> mapEventsToShortDtos(Set<Event> events) {
         return events.stream()

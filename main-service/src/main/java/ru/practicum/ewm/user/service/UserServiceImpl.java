@@ -1,7 +1,6 @@
 package ru.practicum.ewm.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static ru.practicum.ewm.utils.Constants.USER_NOT_FOUND_MESSAGE;
 
@@ -32,18 +30,19 @@ public class UserServiceImpl implements UserService {
         return userDto;
     }
 
-   @Override
-   @Transactional
-   public List<UserDto> get(List<Integer> ids, Integer from, Integer size) {
-       Pageable pageable = PageRequest.of(from / size, size);
-       Page<User> usersPage = (ids == null || ids.isEmpty())
-               ? userRepository.findAll(pageable)
-               : userRepository.findByIdIn(ids, pageable);
+    @Override
+    @Transactional
+    public List<UserDto> get(List<Integer> ids, Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size);
 
-       return usersPage.stream()
-               .map(userMapper::toUserDto)
-               .collect(Collectors.toList());
-   }
+        List<User> users = (ids == null || ids.isEmpty())
+                ? userRepository.findAll(pageable).toList() // `findAll` возвращает Page, преобразуем в List
+                : userRepository.findByIdIn(ids, pageable);
+
+        return users.stream()
+                .map(userMapper::toUserDto)
+                .toList();
+    }
 
     @Override
     public void deleteById(Integer userId) {

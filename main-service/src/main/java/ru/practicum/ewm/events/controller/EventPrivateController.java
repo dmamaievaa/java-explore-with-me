@@ -1,6 +1,7 @@
 package ru.practicum.ewm.events.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,9 @@ import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 
 import java.util.List;
 
+import static ru.practicum.ewm.utils.Constants.DEFAULT_FROM;
+import static ru.practicum.ewm.utils.Constants.DEFAULT_SIZE;
+
 @RestController
 @RequestMapping("/users/{userId}/events")
 @RequiredArgsConstructor
@@ -31,8 +35,8 @@ public class EventPrivateController {
 
     @GetMapping
     public List<EventShortDto> get(@PathVariable("userId") Integer userId,
-                                                      @RequestParam(defaultValue = "0") int from,
-                                                      @RequestParam(defaultValue = "10") int size) {
+                                   @RequestParam(defaultValue = DEFAULT_FROM + "") int from,
+                                   @RequestParam(defaultValue = DEFAULT_SIZE + "") @Min(1) int size) {
         return eventService.getByCurrentUser(userId, from, size);
     }
 

@@ -49,9 +49,6 @@ public class CategoryServiceImpl implements CategoryService {
 
    @Override
    public List<CategoryDto> get(int offset, int size) {
-       if (size <= 0) {
-           throw new IllegalArgumentException("Size must be greater than 0");
-       }
        Pageable pageable = PageRequest.of(offset / size, size);
        return categoryRepository.findAll(pageable)
                .getContent()

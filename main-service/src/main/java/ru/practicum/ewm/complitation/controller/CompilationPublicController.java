@@ -12,6 +12,9 @@ import ru.practicum.ewm.complitation.service.CompilationService;
 
 import java.util.List;
 
+import static ru.practicum.ewm.utils.Constants.DEFAULT_FROM;
+import static ru.practicum.ewm.utils.Constants.DEFAULT_SIZE;
+
 @RestController
 @RequestMapping("/compilations")
 @RequiredArgsConstructor
@@ -20,8 +23,8 @@ public class CompilationPublicController {
 
     @GetMapping
     public List<CompilationDto> getCompilations(@RequestParam(required = false) Boolean pinned,
-                                                @RequestParam (defaultValue = "0") @Min(0) int from,
-                                                @RequestParam (defaultValue = "10") @Min(1) int size) {
+                                                @RequestParam (defaultValue = DEFAULT_FROM + "") @Min(0) int from,
+                                                @RequestParam (defaultValue = DEFAULT_SIZE + "") @Min(1) int size) {
         return compilationService.getAll(pinned, from, size);
     }
 

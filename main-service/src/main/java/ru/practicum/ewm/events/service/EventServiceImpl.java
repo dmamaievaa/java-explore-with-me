@@ -43,7 +43,6 @@ import ru.practicum.ewm.user.repository.UserRepository;
 import ru.practicum.ewm.utils.EventSpec;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -157,18 +156,16 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getByCurrentUser(Integer userId, int from, int size) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format(USER_NOT_FOUND_MESSAGE, userId)));
 
         Pageable pageable = PageRequest.of(from / size, size);
 
-        Page<Event> page = eventRepository.findAllByInitiator(user, pageable);
+        List<Event> events = eventRepository.findAllByInitiator(user, pageable);
 
-        return page.isEmpty() ? List.of() :
-                page.getContent().stream()
-                        .map(eventMapper::toShortDto)
-                        .collect(Collectors.toList());
+        return events.stream()
+                .map(eventMapper::toShortDto)
+                .toList();
     }
 
     @Override
@@ -249,7 +246,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findEventByIdAndInitiator(eventId, user)
                 .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
 
-        Collection<ParticipationRequest> requests = requestRepository.findByEvent(event);
+        List<ParticipationRequest> requests = requestRepository.findByEvent(event);
 
         return requests.isEmpty()
                 ? List.of()
@@ -270,8 +267,12 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
 
         if (event.getParticipantLimit() == 0 || !event.isRequestModeration()) {
+            List<ParticipationRequestDto> confirmedRequests = requestRepository.findByEvent(event).stream()
+                    .map(requestMapper::toParticipationRequestDto)
+                    .toList();
+
             return EventRequestStatusUpdateResult.builder()
-                    .confirmedRequests(requestRepository.findByEvent(event).stream().map(requestMapper::toParticipationRequestDto).toList())
+                    .confirmedRequests(confirmedRequests)
                     .rejectedRequests(List.of())
                     .build();
         }

@@ -15,4 +15,8 @@ public class Constants {
     public static final String USER_NOT_FOUND_MESSAGE = "User with id=%d not found";
 
     public static final String CAT_NOT_FOUND_MESSAGE = "Category with id=%d not found";
+
+    public static final int DEFAULT_FROM = 0;
+
+    public static final int DEFAULT_SIZE = 10;
 }

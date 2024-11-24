@@ -10,6 +10,8 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static ru.practicum.ewm.utils.Constants.DEFAULT_FROM;
+import static ru.practicum.ewm.utils.Constants.DEFAULT_SIZE;
 
 @RestController
 @RequestMapping("/admin/users")
@@ -26,8 +28,8 @@ public class UserAdminController {
 
     @GetMapping
     public List<UserDto> getAll(@RequestParam(required = false) List<Integer> ids,
-                                @RequestParam(defaultValue = "0") int from,
-                                @RequestParam(defaultValue = "10") int size) {
+                                @RequestParam(defaultValue = DEFAULT_FROM + "") int from,
+                                @RequestParam(defaultValue = DEFAULT_SIZE + "") int size) {
         return  userService.get(ids, from, size);
     }
 

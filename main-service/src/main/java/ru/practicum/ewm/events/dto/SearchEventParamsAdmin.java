@@ -15,6 +15,8 @@ import ru.practicum.ewm.events.enums.State;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.ewm.utils.Constants.DEFAULT_DATE_TIME_FORMAT;
+
 
 @Getter
 @Setter
@@ -30,10 +32,10 @@ public class SearchEventParamsAdmin {
 
     List<Integer> categories;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMAT)
     LocalDateTime rangeStart;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMAT)
     LocalDateTime rangeEnd;
 
     @PositiveOrZero

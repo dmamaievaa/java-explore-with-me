@@ -7,10 +7,11 @@ import ru.practicum.ewm.request.enums.RequestStatus;
 import ru.practicum.ewm.user.model.User;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface RequestRepository extends JpaRepository<ParticipationRequest, Integer> {
 
-    Collection<ParticipationRequest> findByEvent(Event event);
+    List<ParticipationRequest> findByEvent(Event event);
 
     Collection<ParticipationRequest> findByRequester(User user);
 

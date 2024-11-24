@@ -12,6 +12,9 @@ import ru.practicum.ewm.category.service.CategoryService;
 
 import java.util.List;
 
+import static ru.practicum.ewm.utils.Constants.DEFAULT_FROM;
+import static ru.practicum.ewm.utils.Constants.DEFAULT_SIZE;
+
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
@@ -20,8 +23,8 @@ public class CategoryPublicController {
 
     @GetMapping
     public List<CategoryDto> get(
-            @RequestParam(defaultValue = "0") @Min(0) int from,
-            @RequestParam(defaultValue = "10") @Min(1) int size) {
+            @RequestParam(defaultValue = DEFAULT_FROM + "") @Min(0) int from,
+            @RequestParam(defaultValue = DEFAULT_SIZE + "") @Min(1) int size) {
         return categoryService.get(from, size);
     }
 

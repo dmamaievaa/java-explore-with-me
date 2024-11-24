@@ -36,11 +36,7 @@ public class Compilation {
     String title;
 
     @ManyToMany
-    @JoinTable(
-    name = "compilations_to_event",
-    joinColumns = @JoinColumn(name = "compilation_id"),
-    inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
+    @JoinTable(name = "compilations_to_event", joinColumns = @JoinColumn(name = "compilation_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
     Set<Event> events;
 
     @Column(nullable = false)
