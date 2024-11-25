@@ -23,12 +23,23 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
     }
 
-    protected <T> void post(String path, T body) {
+    public <T> void post(String path, T body) {
         makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
+    public <T> ResponseEntity<Object> create(T body) {
+        return makeAndSendRequest(HttpMethod.POST, "/hit", null, body);
+    }
+
+
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method,
+                                                          String path,
+                                                          @Nullable Map<String, Object> parameters,
+                                                          @Nullable T body) {
+        HttpEntity<T> requestEntity = null;
+        if (body != null) {
+            requestEntity = new HttpEntity<>(body);
+        }
 
         ResponseEntity<Object> statsServerResponse;
         try {

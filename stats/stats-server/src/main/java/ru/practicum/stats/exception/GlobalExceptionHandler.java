@@ -40,6 +40,12 @@ public class GlobalExceptionHandler {
         return createErrorResponse("Internal Server Error", "An unexpected error occurred: " + ex.getMessage());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadRequestException(BadRequestException ex) {
+        return createErrorResponse("Bad Request Exception", "Incorrectly formed request." + ex.getMessage());
+    }
+
     private ErrorResponse createErrorResponse(String error, String message) {
         return new ErrorResponse(error, message);
     }

@@ -17,7 +17,7 @@ services:
     image: postgres:16.1
     container_name: statsdb
     ports:
-      - "6432:5432"
+      - "5431:5432"
     environment:
       - POSTGRES_DB=statsdb
       - POSTGRES_USER=statsdb
@@ -35,23 +35,23 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      ewmdb:
+      main:
         condition: service_healthy
     environment:
       - CLIENT_URL=http://stats-server:9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewmdb:5431/ewmdb
-      - SPRING_DATASOURCE_USERNAME=ewm
-      - SPRING_DATASOURCE_PASSWORD=ewm
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://main:5432/main
+      - SPRING_DATASOURCE_USERNAME=main
+      - SPRING_DATASOURCE_PASSWORD=main
 
-  ewmdb:
+  main:
     image: postgres:16.1
-    container_name: ewmdb
+    container_name: main
     ports:
-      - "6431:5431"
+      - "5432:5432"
     environment:
-      - POSTGRES_DB=ewmdb
-      - POSTGRES_USER=ewmdb
-      - POSTGRES_PASSWORD=ewmdb
+      - POSTGRES_DB=main
+      - POSTGRES_USER=main
+      - POSTGRES_PASSWORD=main
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
