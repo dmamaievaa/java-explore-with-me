@@ -249,4 +249,5 @@ PATCH /admin/events/8/hide-likes?hideLikes=true
 - **Maven 3.8+**
 - **PostgreSQL** (для хранения данных)
 
+https://github.com/dmamaievaa/java-explore-with-me/pull/5
 
