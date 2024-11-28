@@ -379,9 +379,9 @@ public class EventServiceImpl implements EventService {
 
         Pageable pageable = PageRequest.of(0, limit, sorting);
 
-        Page<Event> events = eventRepository.findAllByState(State.PUBLISHED, pageable);
+        List<Event> events = eventRepository.findAllByState(State.PUBLISHED, pageable);
 
-        return events.getContent().stream()
+        return events.stream()
                 .map(event -> event.isLikesHidden()
                         ? eventMapper.toEventShortDtoWithoutReactions(event)
                         : eventMapper.toShortDto(event))
