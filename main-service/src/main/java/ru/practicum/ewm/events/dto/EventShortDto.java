@@ -36,4 +36,13 @@ public class EventShortDto {
     String title;
 
     Integer views;
+
+    Integer likes;
+
+    Integer dislikes;
+
+    Float rating;
+
+    @Builder.Default
+    boolean likesHidden = false;
 }

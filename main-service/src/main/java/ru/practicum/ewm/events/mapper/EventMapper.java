@@ -54,6 +54,32 @@ public class EventMapper {
                 .participantLimit(event.getParticipantLimit())
                 .requestModeration(event.isRequestModeration())
                 .views(event.getViews())
+                .likes(event.getLikes())
+                .dislikes(event.getDislikes())
+                .rating(event.getRating())
+                .likesHidden(event.isLikesHidden())
+                .build();
+    }
+
+    public EventFullDto toEventFullDtoWithoutReactions(Event event) {
+        return EventFullDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .category(categoryMapper.toCategoryDto(event.getCategory()))
+                .location(toLocationDto(event.getLocation()))
+                .state(event.getState())
+                .eventDate(event.getEventDate())
+                .createdOn(event.getCreatedOn())
+                .publishedOn(event.getPublishedOn())
+                .confirmedRequests(event.getConfirmedRequests())
+                .initiator(userMapper.toUserShortDto(event.getInitiator()))
+                .paid(event.isPaid())
+                .participantLimit(event.getParticipantLimit())
+                .requestModeration(event.isRequestModeration())
+                .views(event.getViews())
+                .likesHidden(event.isLikesHidden())
                 .build();
     }
 
@@ -68,6 +94,26 @@ public class EventMapper {
                 .paid(event.isPaid())
                 .title(event.getTitle())
                 .views(event.getViews())
+                .likes(event.getLikes())
+                .dislikes(event.getDislikes())
+                .rating(event.getRating())
+                .build();
+    }
+
+    public EventShortDto toEventShortDtoWithoutReactions(Event event) {
+        return EventShortDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(categoryMapper.toCategoryDto(event.getCategory()))
+                .confirmedRequests(event.getConfirmedRequests())
+                .eventDate(event.getEventDate())
+                .initiator(userMapper.toUserShortDto(event.getInitiator()))
+                .paid(event.isPaid())
+                .title(event.getTitle())
+                .views(event.getViews())
+                .likes(event.getLikes())
+                .dislikes(event.getDislikes())
+                .rating(event.getRating())
                 .build();
     }
 
@@ -89,6 +135,9 @@ public class EventMapper {
                 .state(State.PENDING)
                 .title(newEventDto.getTitle())
                 .views(0)
+                .likes(0)
+                .dislikes(0)
+                .likesHidden(newEventDto.isLikesHidden())
                 .build();
     }
 

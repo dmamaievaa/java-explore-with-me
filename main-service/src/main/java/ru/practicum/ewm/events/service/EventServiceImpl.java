@@ -73,7 +73,7 @@ public class EventServiceImpl implements EventService {
         Specification<Event> spec = EventSpec.getAdminFilters(searchEventParamsAdmin);
         Page<Event> events = eventRepository.findAll(spec, pageable);
         return events.stream()
-                .map(eventMapper::toEventFullDto)
+                .map(event -> event.isLikesHidden() ? eventMapper.toEventFullDtoWithoutReactions(event) : eventMapper.toEventFullDto(event))
                 .collect(Collectors.toList());
     }
 
@@ -85,7 +85,7 @@ public class EventServiceImpl implements EventService {
         eventMapper.updateEventFromAdminRequest(event, updateEventAdminRequest);
         Event updatedEvent = eventRepository.save(event);
 
-        return eventMapper.toEventFullDto(updatedEvent);
+        return updatedEvent.isLikesHidden() ? eventMapper.toEventFullDtoWithoutReactions(updatedEvent) : eventMapper.toEventFullDto(updatedEvent);
     }
 
     @Override
@@ -128,30 +128,24 @@ public class EventServiceImpl implements EventService {
         eventRepository.saveAll(updatedEvents);
 
         return events.getContent().stream()
-                .map(eventMapper::toShortDto)
+                .map(event -> event.isLikesHidden() ? eventMapper.toEventShortDtoWithoutReactions(event) : eventMapper.toShortDto(event))
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public EventFullDto getById(Integer eventId, HttpServletRequest request) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
-
-        if (event.getState() != State.PUBLISHED) {
-            throw new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId));
-        }
+        Event event = findPublishedEventById(eventId);
 
         Integer views = eventStatService.getUniqueViews(event, request.getRequestURI());
-
         event.setViews(views);
 
         event = eventRepository.save(event);
 
         EventFullDto fullDto = eventMapper.toEventFullDto(event);
-
         eventStatService.sendStatData(request);
-        return fullDto;
+
+        return event.isLikesHidden() ? eventMapper.toEventFullDtoWithoutReactions(event) : fullDto;
     }
 
     @Override
@@ -164,7 +158,9 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findAllByInitiator(user, pageable);
 
         return events.stream()
-                .map(eventMapper::toShortDto)
+                .map(event -> event.isLikesHidden()
+                        ? eventMapper.toEventShortDtoWithoutReactions(event)
+                        : eventMapper.toShortDto(event))
                 .toList();
     }
 
@@ -190,7 +186,7 @@ public class EventServiceImpl implements EventService {
         event.setLocation(location);
 
         event = eventRepository.save(event);
-        return eventMapper.toEventFullDto(event);
+        return event.isLikesHidden() ? eventMapper.toEventFullDtoWithoutReactions(event) : eventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -202,7 +198,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findEventByIdAndInitiator(eventId, user)
                 .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
 
-        return eventMapper.toEventFullDto(event);
+        return event.isLikesHidden() ? eventMapper.toEventFullDtoWithoutReactions(event) : eventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -233,7 +229,7 @@ public class EventServiceImpl implements EventService {
 
         event = eventRepository.save(event);
 
-        return eventMapper.toEventFullDto(event);
+        return event.isLikesHidden() ? eventMapper.toEventFullDtoWithoutReactions(event) : eventMapper.toEventFullDto(event);
     }
 
 
@@ -314,5 +310,93 @@ public class EventServiceImpl implements EventService {
                         .map(requestMapper::toParticipationRequestDto)
                         .toList())
                 .build();
+    }
+
+    @Override
+    public void increaseLikes(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
+
+        event.setLikes(event.getLikes() + 1);
+        eventRepository.save(event);
+
+        updateEventRatingValue(eventId);
+    }
+
+    @Override
+    public void reduceLikes(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
+
+        event.setLikes(event.getLikes() > 0 ? event.getLikes() - 1 : 0);
+        eventRepository.save(event);
+
+        updateEventRatingValue(eventId);
+    }
+
+    @Override
+    public void increaseDislikes(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
+
+        event.setDislikes(event.getDislikes() + 1);
+        eventRepository.save(event);
+
+        updateEventRatingValue(eventId);
+    }
+
+    @Override
+    public void reduceDislikes(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
+
+        event.setDislikes(event.getDislikes() > 0 ? event.getDislikes() - 1 : 0);
+        eventRepository.save(event);
+
+        updateEventRatingValue(eventId);
+    }
+
+    @Override
+    public void updateEventRatingValue(Integer eventId) {
+        Event event = findPublishedEventById(eventId);
+
+        float rating = event.getLikes() - event.getDislikes();
+
+        event.setRating(rating);
+        eventRepository.save(event);
+    }
+
+    private Event findPublishedEventById(Integer eventId) {
+        return eventRepository.findByIdAndState(eventId, State.PUBLISHED)
+                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
+    }
+
+    @Override
+    public List<EventShortDto> getTopRatedEvents(int limit, HttpServletRequest request) {
+        log.info("Fetching top {} events sorted by rating. Request URI: {}", limit, request.getRequestURI());
+
+        Sort sorting = Sort.by(Sort.Order.desc("rating"));
+
+        Pageable pageable = PageRequest.of(0, limit, sorting);
+
+        Page<Event> events = eventRepository.findAllByState(State.PUBLISHED, pageable);
+
+        return events.getContent().stream()
+                .map(event -> event.isLikesHidden()
+                        ? eventMapper.toEventShortDtoWithoutReactions(event)
+                        : eventMapper.toShortDto(event))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EventFullDto updateLikesVisibility(Integer eventId, Boolean hideLikes) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format(EVENT_NOT_FOUND_MESSAGE, eventId)));
+
+        event.setLikesHidden(hideLikes);
+
+        eventRepository.save(event);
+
+        return event.isLikesHidden() ? eventMapper.toEventFullDtoWithoutReactions(event) : eventMapper.toEventFullDto(event);
     }
 }

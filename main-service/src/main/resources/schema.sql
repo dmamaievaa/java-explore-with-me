@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS location CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS likes CASCADE;
 DROP TABLE IF EXISTS events CASCADE;
 DROP TABLE IF EXISTS compilations CASCADE;
 DROP TABLE If EXISTS requests CASCADE;
@@ -37,8 +38,12 @@ CREATE TABLE IF NOT EXISTS events (
     participant_limit  INTEGER DEFAULT 0,
     published_date     TIMESTAMP WITHOUT TIME ZONE,
     request_moderation BOOLEAN DEFAULT true,
-    state             VARCHAR(200),
+    state              VARCHAR(200),
     title              VARCHAR(120)                NOT NULL,
+    likes              INTEGER DEFAULT 0,
+    dislikes           INTEGER DEFAULT 0,
+    rating             NUMERIC(4, 2) DEFAULT 0.00,
+    likes_hidden       BOOLEAN DEFAULT false,
     CONSTRAINT event_to_user FOREIGN KEY (initiator_id) REFERENCES users (id),
     CONSTRAINT event_to_category FOREIGN KEY (category_id) REFERENCES categories (id),
     CONSTRAINT location FOREIGN KEY (location_id) REFERENCES location (id)
@@ -68,3 +73,10 @@ CREATE TABLE IF NOT EXISTS compilations_to_event (
      CONSTRAINT event_compilation_to_compilation FOREIGN KEY (compilation_id) REFERENCES compilations (id) ON UPDATE CASCADE
     );
 
+CREATE TABLE IF NOT EXISTS likes (
+    event_id        BIGINT,
+    user_id         BIGINT,
+    PRIMARY KEY (event_id, user_id),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
