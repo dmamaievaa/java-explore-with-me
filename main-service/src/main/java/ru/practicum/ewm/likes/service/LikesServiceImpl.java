@@ -105,11 +105,11 @@ public class LikesServiceImpl implements LikesService {
     public List<Like> search(Integer eventId, Integer userId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
         if (eventId != null && userId != null) {
-            return likesRepository.findAllByEventIdAndUserId(eventId, userId, pageable).getContent();
+            return likesRepository.findAllByEventIdAndUserId(eventId, userId, pageable);
         } else if (eventId != null) {
-            return likesRepository.findAllByEventId(eventId, pageable).getContent();
+            return likesRepository.findAllByEventId(eventId, pageable);
         } else if (userId != null) {
-            return likesRepository.findAllByUserId(userId, pageable).getContent();
+            return likesRepository.findAllByUserId(userId, pageable);
         } else {
             return likesRepository.findAll(pageable).getContent();
         }
