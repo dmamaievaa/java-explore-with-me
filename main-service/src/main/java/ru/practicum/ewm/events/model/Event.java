@@ -77,4 +77,15 @@ public class Event {
     String title;
 
     Integer views;
+
+    @Column(nullable = false)
+    Integer likes = 0;
+
+    @Column(nullable = false)
+    Integer dislikes = 0;
+
+    Float rating;
+
+    @Column(name = "likes_hidden")
+    private boolean likesHidden = false;
 }

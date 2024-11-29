@@ -55,4 +55,7 @@ public class NewEventDto {
 
     @Size(min = 3, max = 120, message = "min length for title field is 3, max length is 120 characters")
     String title;
+
+    @Builder.Default
+    boolean likesHidden = false;
 }

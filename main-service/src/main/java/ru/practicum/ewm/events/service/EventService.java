@@ -39,4 +39,18 @@ public interface EventService {
                                                 Integer eventId,
                                                 EventRequestStatusUpdateRequest statusUpdateRequest);
 
+    void increaseLikes(Integer eventId);
+
+    void reduceLikes(Integer eventId);
+
+    void increaseDislikes(Integer eventId);
+
+    void reduceDislikes(Integer eventId);
+
+    void updateEventRatingValue(Integer eventId);
+
+    List<EventShortDto> getTopRatedEvents(int limit, HttpServletRequest request);
+
+    EventFullDto updateLikesVisibility(Integer eventId, Boolean hideLikes);
+
 }
